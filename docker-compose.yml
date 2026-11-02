@@ -1,0 +1,23 @@
+version: '3'
+services:
+  jellyfin-profanity-filter-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: jellyfin-profanity-filter-ai
+    network_mode: host
+    volumes:
+      # Mount models directory (read-only) - models run INSIDE container
+      - /mnt/user/appdata/jellyfin-ai/models:/app/models:ro
+    environment:
+      - MODEL_PATH=/app/models/ggml-phi-2-f16.gguf
+      - MODEL_TYPE=phi-2
+      - CONFIDENCE_THRESHOLD=0.5
+      - AUDIO_CHUNK_SIZE=1000
+      - N_BATCH=512
+      - N_THREADS=4
+    restart_policy:
+      condition: on-failure
+      delay: 5s
+      max_attempts: 3
+      window: 120s
